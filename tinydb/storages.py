@@ -8,7 +8,7 @@ import json
 import os
 import warnings
 from abc import ABC, abstractmethod
-from typing import Dict, Any, Optional
+from typing import Any, Optional
 
 __all__ = ('Storage', 'JSONStorage', 'MemoryStorage')
 
@@ -45,7 +45,7 @@ class Storage(ABC):
     # implemented read and write
 
     @abstractmethod
-    def read(self) -> Optional[Dict[str, Dict[str, Any]]]:
+    def read(self) -> Optional[dict[str, dict[str, Any]]]:
         """
         Read the current state.
 
@@ -57,7 +57,7 @@ class Storage(ABC):
         raise NotImplementedError('To be overridden!')
 
     @abstractmethod
-    def write(self, data: Dict[str, Dict[str, Any]]) -> None:
+    def write(self, data: dict[str, dict[str, Any]]) -> None:
         """
         Write the current state of the database to the storage.
 
@@ -122,7 +122,7 @@ class JSONStorage(Storage):
     def close(self) -> None:
         self._handle.close()
 
-    def read(self) -> Optional[Dict[str, Dict[str, Any]]]:
+    def read(self) -> Optional[dict[str, dict[str, Any]]]:
         # Get the file size by moving the cursor to the file end and reading
         # its location
         self._handle.seek(0, os.SEEK_END)
@@ -139,7 +139,7 @@ class JSONStorage(Storage):
             # Load the JSON contents of the file
             return json.load(self._handle)
 
-    def write(self, data: Dict[str, Dict[str, Any]]):
+    def write(self, data: dict[str, dict[str, Any]]):
         # Move the cursor to the beginning of the file just in case
         self._handle.seek(0)
 
@@ -174,8 +174,8 @@ class MemoryStorage(Storage):
         super().__init__()
         self.memory = None
 
-    def read(self) -> Optional[Dict[str, Dict[str, Any]]]:
+    def read(self) -> Optional[dict[str, dict[str, Any]]]:
         return self.memory
 
-    def write(self, data: Dict[str, Dict[str, Any]]):
+    def write(self, data: dict[str, dict[str, Any]]):
         self.memory = data

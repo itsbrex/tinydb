@@ -9,7 +9,8 @@ This would delete the ``foo`` field from all documents where ``foo`` equals 2.
 """
 
 
-from typing import Callable, MutableMapping, Any, Union
+from collections.abc import Callable, MutableMapping
+from typing import Any, Union
 
 
 def delete(field: str) -> Callable[[MutableMapping], None]:

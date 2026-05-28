@@ -3,18 +3,12 @@ This module implements tables, the central place for accessing and manipulating
 data in TinyDB.
 """
 
+from collections.abc import Callable, Iterable, Iterator, Mapping
 from typing import (
-    Callable,
-    Dict,
-    Iterable,
-    Iterator,
-    List,
-    Mapping,
     NoReturn,
     Optional,
     Union,
     cast,
-    Tuple,
     overload
 )
 
@@ -110,7 +104,7 @@ class Table:
 
         self._storage = storage
         self._name = name
-        self._query_cache: LRUCache[QueryLike, List[Document]] \
+        self._query_cache: LRUCache[QueryLike, list[Document]] \
             = self.query_cache_class(capacity=cache_size)
 
         self._next_id = None
@@ -180,7 +174,7 @@ class Table:
 
         return doc_id
 
-    def insert_multiple(self, documents: Iterable[Mapping]) -> List[int]:
+    def insert_multiple(self, documents: Iterable[Mapping]) -> list[int]:
         """
         Insert multiple documents into the table.
 
@@ -224,7 +218,7 @@ class Table:
 
         return doc_ids
 
-    def all(self) -> List[Document]:
+    def all(self) -> list[Document]:
         """
         Get all documents stored in the table.
 
@@ -238,7 +232,7 @@ class Table:
 
         return list(iter(self))
 
-    def search(self, cond: QueryLike) -> List[Document]:
+    def search(self, cond: QueryLike) -> list[Document]:
         """
         Search for all documents matching a 'where' cond.
 
@@ -297,34 +291,34 @@ class Table:
 
     @overload
     def get(
-        self, cond: Optional[QueryLike], doc_id: int, doc_ids: Optional[List] = ...
+        self, cond: Optional[QueryLike], doc_id: int, doc_ids: Optional[list] = ...
     ) -> Optional[Document]: ...
 
     @overload
     def get(
-        self, *, cond: Optional[QueryLike] = ..., doc_id: int, doc_ids: Optional[List] = ...,
+        self, *, cond: Optional[QueryLike] = ..., doc_id: int, doc_ids: Optional[list] = ...,
     ) -> Optional[Document]: ...
 
     @overload
     def get(
-        self, cond: Optional[QueryLike], doc_id: None, doc_ids: List
-    ) -> List[Document]: ...
+        self, cond: Optional[QueryLike], doc_id: None, doc_ids: list
+    ) -> list[Document]: ...
 
     @overload
     def get(
-        self, cond: Optional[QueryLike], *, doc_id: None = ..., doc_ids: List
-    ) -> List[Document]: ...
+        self, cond: Optional[QueryLike], *, doc_id: None = ..., doc_ids: list
+    ) -> list[Document]: ...
 
     @overload
     def get(
-        self, *, cond: Optional[QueryLike] = ..., doc_id: None = ..., doc_ids: List
-    ) -> List[Document]: ...
+        self, *, cond: Optional[QueryLike] = ..., doc_id: None = ..., doc_ids: list
+    ) -> list[Document]: ...
 
     def get(
         self,
         cond: Optional[QueryLike] = None,
         doc_id: Optional[int] = None,
-        doc_ids: Optional[List] = None
+        doc_ids: Optional[list] = None
     ):
         """
         Get exactly one document specified by a query or a document ID.
@@ -412,7 +406,7 @@ class Table:
         fields: Union[Mapping, Callable[[Mapping], None]],
         cond: Optional[QueryLike] = None,
         doc_ids: Optional[Iterable[int]] = None,
-    ) -> List[int]:
+    ) -> list[int]:
         """
         Update all matching documents to have a given set of fields.
 
@@ -446,7 +440,7 @@ class Table:
             # determined inside the updater so it reflects the table state at
             # write time.
             requested_ids = list(doc_ids)
-            updated_ids: List[int] = []
+            updated_ids: list[int] = []
 
             def updater(table: dict):
                 # Filter to IDs that exist *before* performing any updates,
@@ -514,9 +508,9 @@ class Table:
     def update_multiple(
         self,
         updates: Iterable[
-            Tuple[Union[Mapping, Callable[[Mapping], None]], QueryLike]
+            tuple[Union[Mapping, Callable[[Mapping], None]], QueryLike]
         ],
-    ) -> List[int]:
+    ) -> list[int]:
         """
         Update all matching documents to have a given set of fields.
 
@@ -563,7 +557,7 @@ class Table:
 
         return updated_ids
 
-    def upsert(self, document: Mapping, cond: Optional[QueryLike] = None) -> List[int]:
+    def upsert(self, document: Mapping, cond: Optional[QueryLike] = None) -> list[int]:
         """
         Update documents, if they exist, insert them otherwise.
 
@@ -582,7 +576,7 @@ class Table:
 
         # Extract doc_id
         if isinstance(document, self.document_class) and hasattr(document, 'doc_id'):
-            doc_ids: Optional[List[int]] = [document.doc_id]
+            doc_ids: Optional[list[int]] = [document.doc_id]
         else:
             doc_ids = None
 
@@ -609,7 +603,7 @@ class Table:
         self,
         cond: Optional[QueryLike] = None,
         doc_ids: Optional[Iterable[int]] = None,
-    ) -> List[int]:
+    ) -> list[int]:
         """
         Remove all matching documents.
 
@@ -629,7 +623,7 @@ class Table:
             # removed IDs is determined inside the updater so it reflects the
             # table state at write time.
             requested_ids = list(doc_ids)
-            removed_ids: List[int] = []
+            removed_ids: list[int] = []
 
             def updater(table: dict):
                 # Filter to IDs that exist *before* performing any removals,
@@ -759,7 +753,7 @@ class Table:
 
         return next_id
 
-    def _read_table(self) -> Dict[str, Mapping]:
+    def _read_table(self) -> dict[str, Mapping]:
         """
         Read the table data from the underlying storage.
 
@@ -784,7 +778,7 @@ class Table:
 
         return table
 
-    def _update_table(self, updater: Callable[[Dict[int, Mapping]], None]):
+    def _update_table(self, updater: Callable[[dict[int, Mapping]], None]):
         """
         Perform a table update operation.
 

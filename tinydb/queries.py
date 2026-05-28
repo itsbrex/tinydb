@@ -17,7 +17,8 @@ False
 """
 
 import re
-from typing import Mapping, Tuple, Callable, Any, Union, List, Optional, Protocol
+from collections.abc import Mapping, Callable
+from typing import Any, Union, Optional, Protocol
 
 from .utils import freeze
 
@@ -69,7 +70,7 @@ class QueryInstance:
     instance can be used as a key in a dictionary.
     """
 
-    def __init__(self, test: Callable[[Mapping], bool], hashval: Optional[Tuple]):
+    def __init__(self, test: Callable[[Mapping], bool], hashval: Optional[tuple]):
         self._test = test
         self._hash = hashval
 
@@ -162,7 +163,7 @@ class Query(QueryInstance):
 
     def __init__(self) -> None:
         # The current path of fields to access when evaluating the object
-        self._path: Tuple[Union[str, Callable], ...] = ()
+        self._path: tuple[Union[str, Callable], ...] = ()
 
         # Prevent empty queries to be evaluated
         def notest(_):
@@ -207,7 +208,7 @@ class Query(QueryInstance):
     def _generate_test(
             self,
             test: Callable[[Any], bool],
-            hashval: Tuple,
+            hashval: tuple,
             allow_empty_path: bool = False
     ) -> QueryInstance:
         """
@@ -390,7 +391,7 @@ class Query(QueryInstance):
             ('test', self._path, func, args)
         )
 
-    def any(self, cond: Union[QueryInstance, List[Any]]) -> QueryInstance:
+    def any(self, cond: Union[QueryInstance, list[Any]]) -> QueryInstance:
         """
         Check if a condition is met by any document in a list,
         where a condition can also be a sequence (e.g. list).
@@ -425,7 +426,7 @@ class Query(QueryInstance):
             ('any', self._path, freeze(cond))
         )
 
-    def all(self, cond: Union['QueryInstance', List[Any]]) -> QueryInstance:
+    def all(self, cond: Union['QueryInstance', list[Any]]) -> QueryInstance:
         """
         Check if a condition is met by all documents in a list,
         where a condition can also be a sequence (e.g. list).
@@ -458,7 +459,7 @@ class Query(QueryInstance):
             ('all', self._path, freeze(cond))
         )
 
-    def one_of(self, items: List[Any]) -> QueryInstance:
+    def one_of(self, items: list[Any]) -> QueryInstance:
         """
         Check if the value is contained in a list or generator.
 
